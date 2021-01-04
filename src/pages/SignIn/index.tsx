@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, useContext } from 'react';
 import { FiLogIn, FiMail, FiLock } from 'react-icons/fi';
 import { Form } from '@unform/web';
 import { FormHandles } from '@unform/core';
@@ -8,6 +8,7 @@ import logo from '../../assets/logo.svg';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 import getVallidationErrors from '../../utils/getValidationErrors';
+import AuthContext from '../../context/AuthContext';
 
 interface DataLoginUser {
   email: string;
@@ -16,6 +17,7 @@ interface DataLoginUser {
 
 const SignIn: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
+  const auth = useContext(AuthContext);
 
   const handleSubmit = useCallback(async (data: DataLoginUser) => {
     try {
