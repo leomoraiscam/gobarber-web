@@ -5,7 +5,7 @@ import {
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
 import { FormHandles } from '@unform/core';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import {
   Container, Content, Background, AnimationContainer,
 } from './styles';
@@ -13,8 +13,10 @@ import logo from '../../assets/logo.svg';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 import getVallidationErrors from '../../utils/getValidationErrors';
+import api from '../../services/api';
+import { useToast } from '../../hooks/toast';
 
-interface DataRegisterUser {
+interface SignUpFormData {
   name: string;
   email: string;
   password: string,
@@ -22,8 +24,10 @@ interface DataRegisterUser {
 
 const SignUp: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
+  const { addToast } = useToast();
+  const history = useHistory();
 
-  const handleSubmit = useCallback(async (data: DataRegisterUser) => {
+  const handleSubmit = useCallback(async (data: SignUpFormData) => {
     try {
       formRef.current?.setErrors({});
 
@@ -41,12 +45,32 @@ const SignUp: React.FC = () => {
       await schema.validate(data, {
         abortEarly: false,
       });
-    } catch (error) {
-      const errors = getVallidationErrors(error);
 
-      formRef.current?.setErrors(errors);
+      await api.post('/users', data);
+
+      history.push('/');
+
+      addToast({
+        type: 'sucess',
+        title: 'Cadastro realizado com sucesso!',
+        description: 'Você já pode fazer seu logon no GoBarber',
+      });
+    } catch (error) {
+      if (error instanceof Yup.ValidationError) {
+        const errors = getVallidationErrors(error);
+
+        formRef.current?.setErrors(errors);
+
+        return;
+      }
+
+      addToast({
+        type: 'error',
+        title: 'Error no cadastro',
+        description: 'Ocorreu um error ao fazer cadastro, verifique os dados e tente novamente',
+      });
     }
-  }, []);
+  }, [addToast, history]);
 
   return (
     <Container>

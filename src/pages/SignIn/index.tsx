@@ -3,7 +3,7 @@ import { FiLogIn, FiMail, FiLock } from 'react-icons/fi';
 import { Form } from '@unform/web';
 import { FormHandles } from '@unform/core';
 import * as Yup from 'yup';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import {
   Container, Content, Background, AnimationContainer,
 } from './styles';
@@ -21,6 +21,7 @@ interface SignInFormData {
 
 const SignIn: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
+  const history = useHistory();
   const { signIn } = useAuth();
   const { addToast } = useToast();
 
@@ -46,6 +47,8 @@ const SignIn: React.FC = () => {
         email: data.email,
         password: data.password,
       });
+
+      history.push('/dashboard');
     } catch (error) {
       if (error instanceof Yup.ValidationError) {
         const errors = getVallidationErrors(error);
@@ -61,7 +64,7 @@ const SignIn: React.FC = () => {
         description: 'Ocorreu um error ao fazer login, cheque as credenciais',
       });
     }
-  }, [signIn, addToast]);
+  }, [signIn, addToast, history]);
 
   return (
     <Container>
