@@ -1,6 +1,8 @@
 import React, {
   useState, useCallback, useEffect, useMemo,
 } from 'react';
+import { isToday, format } from 'date-fns';
+import ptBR from 'date-fns/locale/pt-BR';
 import { FiClock, FiPower } from 'react-icons/fi';
 import DayPicker, { DayModifiers } from 'react-day-picker';
 import logoImg from '../../assets/logo.svg';
@@ -29,12 +31,22 @@ interface MonthAvailabilityItem {
   available: boolean;
 }
 
+interface Appointment {
+  id: string;
+  date: string;
+  user: {
+    name: string;
+    avatar_url: string;
+  }
+}
+
 const Dashboard: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [monthAvailiability, setMonthAvailiability] = useState<
   MonthAvailabilityItem[]
   >([]);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const { signOut, user } = useAuth();
 
   useEffect(() => {
@@ -47,6 +59,18 @@ const Dashboard: React.FC = () => {
       setMonthAvailiability(response.data);
     });
   }, [currentMonth, user.id]);
+
+  useEffect(() => {
+    api.get('appointments/me', {
+      params: {
+        day: selectedDate.getDate(),
+        month: selectedDate.getMonth() + 1,
+        year: selectedDate.getFullYear(),
+      },
+    }).then((response) => {
+      setAppointments(response.data);
+    });
+  }, [selectedDate]);
 
   const handleDateChange = useCallback((day: Date, modifiers: CallendarModifiers) => {
     if (modifiers.available) {
@@ -70,6 +94,14 @@ const Dashboard: React.FC = () => {
 
     return dates;
   }, [currentMonth, monthAvailiability]);
+
+  const setelectedDateAsText = useMemo(() => format(selectedDate, "'Dia' dd 'de' MMMM", {
+    locale: ptBR,
+  }), [selectedDate]);
+
+  const selectedWeekDay = useMemo(() => format(selectedDate, 'cccc', {
+    locale: ptBR,
+  }), [selectedDate]);
 
   return (
     <Container>
@@ -97,9 +129,9 @@ const Dashboard: React.FC = () => {
         <Schedule>
           <h1>Horários agendados</h1>
           <p>
-            <span>Hoje</span>
-            <span>Dia 06</span>
-            <span>Segunda-feira</span>
+            {isToday(selectedDate) && <span>Hoje</span>}
+            <span>{setelectedDateAsText}</span>
+            <span>{selectedWeekDay}</span>
           </p>
 
           <NextAppointment>
