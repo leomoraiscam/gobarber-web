@@ -1,12 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FiClock, FiPower } from 'react-icons/fi';
 import logoImg from '../../assets/logo.svg';
 import {
-  Container, Header, HeaderContent, Profile, Schedule, Callendar, Content, NextAppointment,
+  Container,
+  Header,
+  HeaderContent,
+  Profile,
+  Schedule,
+  Callendar,
+  Content,
+  NextAppointment,
+  Section,
+  Appointment,
 } from './styles';
 import { useAuth } from '../../hooks/auth';
 
 const Dashboard: React.FC = () => {
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const { signOut, user } = useAuth();
 
   return (
@@ -55,6 +65,62 @@ const Dashboard: React.FC = () => {
               </span>
             </div>
           </NextAppointment>
+
+          <Section>
+            <strong>Manhã</strong>
+
+            <Appointment>
+              <span>
+                <FiClock />
+                08:00
+              </span>
+
+              <div>
+                <img
+                  src="https://avatars0.githubusercontent.com/u/49538119?s=400&u=39a6291923942b4f7cc8fcb4bce259d116807701&v=4"
+                  alt="Leonardo Morais"
+                />
+
+                <strong>Leonardo Morais</strong>
+              </div>
+            </Appointment>
+
+            <Appointment>
+              <span>
+                <FiClock />
+                08:00
+              </span>
+
+              <div>
+                <img
+                  src="https://avatars0.githubusercontent.com/u/49538119?s=400&u=39a6291923942b4f7cc8fcb4bce259d116807701&v=4"
+                  alt="Leonardo Morais"
+                />
+
+                <strong>Leonardo Morais</strong>
+              </div>
+            </Appointment>
+          </Section>
+
+          <Section>
+            <strong>Tarde</strong>
+
+            <Appointment>
+              <span>
+                <FiClock />
+                08:00
+              </span>
+
+              <div>
+                <img
+                  src="https://avatars0.githubusercontent.com/u/49538119?s=400&u=39a6291923942b4f7cc8fcb4bce259d116807701&v=4"
+                  alt="Leonardo Morais"
+                />
+
+                <strong>Leonardo Morais</strong>
+              </div>
+            </Appointment>
+          </Section>
         </Schedule>
         <Callendar />
       </Content>
