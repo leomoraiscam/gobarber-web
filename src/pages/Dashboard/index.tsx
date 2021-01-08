@@ -1,4 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import React, {
+  useState, useCallback, useEffect, useMemo,
+} from 'react';
 import { FiClock, FiPower } from 'react-icons/fi';
 import DayPicker, { DayModifiers } from 'react-day-picker';
 import logoImg from '../../assets/logo.svg';
@@ -16,20 +18,58 @@ import {
 } from './styles';
 import { useAuth } from '../../hooks/auth';
 import 'react-day-picker/lib/style.css';
+import api from '../../services/api';
 
 interface CallendarModifiers extends DayModifiers {
   available: boolean;
 }
 
+interface MonthAvailabilityItem {
+  day: number;
+  available: boolean;
+}
+
 const Dashboard: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [monthAvailiability, setMonthAvailiability] = useState<
+  MonthAvailabilityItem[]
+  >([]);
   const { signOut, user } = useAuth();
+
+  useEffect(() => {
+    api.get(`/providers/${user.id}/month-availability`, {
+      params: {
+        month: currentMonth.getMonth() + 1,
+        year: currentMonth.getFullYear(),
+      },
+    }).then((response) => {
+      setMonthAvailiability(response.data);
+    });
+  }, [currentMonth, user.id]);
 
   const handleDateChange = useCallback((day: Date, modifiers: CallendarModifiers) => {
     if (modifiers.available) {
       setSelectedDate(day);
     }
   }, []);
+
+  const handleMonthChange = useCallback((month: Date) => {
+    setCurrentMonth(month);
+  }, []);
+
+  const disableDays = useMemo(() => {
+    const dates = monthAvailiability
+      .filter((monthDay) => monthDay.available === false)
+      .map((monthDay) => {
+        const year = currentMonth.getFullYear();
+        const month = currentMonth.getMonth();
+
+        return new Date(year, month, monthDay.day);
+      });
+
+    return dates;
+  }, [currentMonth, monthAvailiability]);
 
   return (
     <Container>
@@ -140,10 +180,12 @@ const Dashboard: React.FC = () => {
             fromMonth={new Date()}
             disabledDays={[
               { daysOfWeek: [0, 6] },
+              ...disableDays,
             ]}
             modifiers={{
               available: { daysOfWeek: [1, 2, 3, 4, 5] },
             }}
+            onMonthChange={handleMonthChange}
             onDayClick={handleDateChange}
             selectedDays={selectedDate}
             months={[
