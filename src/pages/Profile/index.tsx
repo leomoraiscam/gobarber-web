@@ -115,7 +115,7 @@ const Profile: React.FC = () => {
         description: 'Ocorreu um error ao atualizar perfil, tente novamente',
       });
     }
-  }, [addToast, history]);
+  }, [addToast, history, updateUser]);
 
   const handleAvatarChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const data = new FormData();
