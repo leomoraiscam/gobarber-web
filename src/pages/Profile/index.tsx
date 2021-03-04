@@ -9,7 +9,6 @@ import { Link, useHistory } from 'react-router-dom';
 import {
   Container, Content, AvatarInput,
 } from './styles';
-import logo from '../../assets/logo.svg';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 import getVallidationErrors from '../../utils/getValidationErrors';
